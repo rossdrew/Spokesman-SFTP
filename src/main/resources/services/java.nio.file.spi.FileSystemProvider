@@ -1,0 +1,2 @@
+# if not present, FileSystems.newFileSystem throws NotProviderFoundException
+com.upplication.s3fs.S3FileSystemProvider
