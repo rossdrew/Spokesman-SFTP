@@ -1,5 +1,7 @@
 #SFTPSpokesman
 
+An SFTP Server which, when connected to, provides access to Amazon S3 buckets
+
 #Usage
 
 Start as Java process
