@@ -18,7 +18,9 @@ import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.scp.ScpCommandFactory;
 import org.apache.sshd.server.session.ServerSession;
+import org.apache.sshd.server.shell.InteractiveProcessShellFactory;
 import org.apache.sshd.server.shell.ProcessShellFactory;
+import org.apache.sshd.server.subsystem.sftp.SftpEventListener;
 import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,16 +36,15 @@ import java.security.PublicKey;
 import java.util.*;
 
 /**
- * Created by rossdrew on 28/04/16.
+ * @Author Ross W. Drew
  */
 @Service("sftpService")
-public class SFTPService {
+public class SFTPService implements SpokesmanService {
     static final private Logger LOG = LoggerFactory.getLogger(SFTPService.class);
 
     private SshServer sshd = null;
 
     public static SshServer createSSHServer() throws IOException {
-        LOG.info ("Creating SFTP Server...");
         Map<String, String> options = new LinkedHashMap<String, String>();
         String hostKeyType = AbstractGeneratorHostKeyProvider.DEFAULT_ALGORITHM;
 
@@ -54,20 +55,22 @@ public class SFTPService {
         sshd.setPort(21000);
         sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType));
         sshd.setShellFactory(createShellFactory());
-        sshd.setPasswordAuthenticator(createPasswordAuthenticator());
+        sshd.setPasswordAuthenticator(createPasswordAuthenticator());//Why does it need one of these is if has public key auth?
         sshd.setPublickeyAuthenticator(AcceptAllPublickeyAuthenticator.INSTANCE);
         sshd.setTcpipForwardingFilter(AcceptAllForwardingFilter.INSTANCE);
         sshd.setCommandFactory(createCommandFactory());
+
         sshd.setSubsystemFactories(createSubsystemFactories());
         sshd.setFileSystemFactory(createFileSystemFactory());
 
         sshd.start();
+        LOG.info ("Started SFTP Server!");
         return sshd;
     }
 
     private static FileSystemFactory createFileSystemFactory() {
-        //TODO needs to be the custom Amazon S3 FileSystem factory
-        URI uri = URI.create("s3:///myuri");
+        URI uri = URI.create("s3:///s3.amazonaws.com"); //XXX speed up by putting in the correct region
+
         FileSystemFactory s3FileSystemFactory = new S3FileSystemFactory(uri);
 
         FileSystemFactory localFileSystemFactory =  new VirtualFileSystemFactory(new File(".").toPath());
@@ -77,12 +80,15 @@ public class SFTPService {
 
     private static Factory<Command> createShellFactory() {
         return new ProcessShellFactory(new String[] { "/bin/sh", "-i", "-l" });
-        //  return InteractiveProcessShellFactory.INSTANCE;
+        //return InteractiveProcessShellFactory.INSTANCE;
     }
 
     private static List<NamedFactory<Command>> createSubsystemFactories() {
         List<NamedFactory<Command>> subsystemFactories = new ArrayList<NamedFactory<Command>>(1);
-        subsystemFactories.add(new SftpSubsystemFactory());
+        SftpSubsystemFactory factory = new SftpSubsystemFactory();
+        factory.addSftpEventListener(new STFPWatcher());
+
+        subsystemFactories.add(factory);
         return subsystemFactories;
     }
 
@@ -134,9 +140,6 @@ public class SFTPService {
     }
 
     public SFTPService(){
-        LOG.debug ("** DEBUG ENABLED **");
-        LOG.trace ("** TRACE ENABLED **");
-
         if (sshd != null)
             return;
 
@@ -149,10 +152,14 @@ public class SFTPService {
         while (sshd != null && sshd.isOpen()) {//HACKY MAKE BETTER
             try {
                 Thread.sleep(1000);
-                /*DEBUG*/System.out.print(".");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public String getStatus() {
+        return "STATUS NOT IMPLEMENTED";
     }
 }
