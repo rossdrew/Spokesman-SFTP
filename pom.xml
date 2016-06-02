@@ -19,24 +19,18 @@
     </properties>
 
     <dependencies>
-        <dependency>
+        <dependency> <!-- Spring Boot -->
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.5</version>
-        </dependency>
-
-        <dependency>
+        <dependency> <!-- Apache MINA SSHD -->
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-core</artifactId>
             <version>1.2.0</version>
         </dependency>
 
-        <dependency>
+        <dependency> <!-- Encryption (Bouncy Castle) -->
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpg-jdk15on</artifactId>
             <optional>true</optional>
@@ -54,10 +48,16 @@
             <version>1.54</version>
         </dependency>
 
+        <dependency> <!-- Logging -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+
         <dependency> <!-- S3 Filesystem -->
             <groupId>com.upplication</groupId>
             <artifactId>s3fs</artifactId>
-            <version>1.2.1</version>
+            <version>1.3.0</version>
         </dependency>
     </dependencies>
 
