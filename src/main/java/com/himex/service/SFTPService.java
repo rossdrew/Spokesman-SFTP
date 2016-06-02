@@ -69,7 +69,9 @@ public class SFTPService implements SpokesmanService {
     }
 
     private static FileSystemFactory createFileSystemFactory() {
-        URI uri = URI.create("s3:///s3.amazonaws.com"); //XXX speed up by putting in the correct region
+        //XXX speed up by putting in the correct region
+        //XXX always defaults to ImageTransfer bucket even with url = hubio-ubi-ftp.s3.amazonaws.com
+        URI uri = URI.create("s3:///s3.amazonaws.com");
 
         FileSystemFactory s3FileSystemFactory = new S3FileSystemFactory(uri);
 
