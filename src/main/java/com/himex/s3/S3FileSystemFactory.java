@@ -17,16 +17,24 @@ import java.util.HashMap;
 public class S3FileSystemFactory implements FileSystemFactory {
     private URI uri = URI.create("localhost");
 
+    //XXX Without caching this I get FileSystemAlreadyExistsException
     private FileSystem s3FileSystem = null;
+    private S3FileSystemProviderWithFileChannel provider;
 
     public S3FileSystemFactory(URI uri){
         this.uri = uri;
     }
 
     public FileSystem createFileSystem(Session session) throws IOException {
+        if (provider == null){
+            provider = new S3FileSystemProviderWithFileChannel();
+        }
+
         if (s3FileSystem == null) {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            s3FileSystem = FileSystems.newFileSystem(uri, new HashMap<String, Object>(), classLoader);
+
+            //s3FileSystem = FileSystems.newFileSystem(uri, new HashMap<String, Object>(), classLoader);
+            s3FileSystem = provider.newFileSystem(uri, new HashMap<String, Object>());
         }
 
         return s3FileSystem;

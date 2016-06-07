@@ -3,8 +3,6 @@ package com.himex.s3;
 import com.google.common.base.Preconditions;
 import com.upplication.s3fs.S3FileSystemProvider;
 import com.upplication.s3fs.S3Path;
-import com.upplication.s3fs.util.S3FileChannel;
-
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.LinkOption;
@@ -15,11 +13,12 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * Overriding S3FileSystemProvider to provide a FileChannel option (via newFileChannel())
  * and adding permissions attribute required by Apache MINA SSHD
  *
- * @Author rossdrew
+ * @Author Ross W. Drew
  */
 public class S3FileSystemProviderWithFileChannel extends S3FileSystemProvider {
     /**

@@ -1,6 +1,7 @@
 package com.himex;
 
 import com.himex.s3.S3FileSystemFactory;
+import com.upplication.s3fs.S3FileSystemProvider;
 import com.upplication.s3fs.S3Iterator;
 import com.upplication.s3fs.S3Path;
 import org.apache.sshd.common.file.FileSystemFactory;
@@ -32,3 +33,4 @@ public class Spokesman {
     }
 
 }
+;

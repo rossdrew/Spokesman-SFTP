@@ -54,11 +54,8 @@ public class SFTPService implements SpokesmanService {
 
         sshd.setPort(21000);
         sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType));
-        sshd.setShellFactory(createShellFactory());
         sshd.setPasswordAuthenticator(createPasswordAuthenticator());//Why does it need one of these is if has public key auth?
         sshd.setPublickeyAuthenticator(AcceptAllPublickeyAuthenticator.INSTANCE);
-        sshd.setTcpipForwardingFilter(AcceptAllForwardingFilter.INSTANCE);
-        sshd.setCommandFactory(createCommandFactory());
 
         sshd.setSubsystemFactories(createSubsystemFactories());
         sshd.setFileSystemFactory(createFileSystemFactory());
@@ -80,29 +77,13 @@ public class SFTPService implements SpokesmanService {
         return s3FileSystemFactory;
     }
 
-    private static Factory<Command> createShellFactory() {
-        return new ProcessShellFactory(new String[] { "/bin/sh", "-i", "-l" });
-        //return InteractiveProcessShellFactory.INSTANCE;
-    }
-
     private static List<NamedFactory<Command>> createSubsystemFactories() {
         List<NamedFactory<Command>> subsystemFactories = new ArrayList<NamedFactory<Command>>(1);
         SftpSubsystemFactory factory = new SftpSubsystemFactory();
-        factory.addSftpEventListener(new STFPWatcher());
+        //factory.addSftpEventListener(new STFPWatcher());
 
         subsystemFactories.add(factory);
         return subsystemFactories;
-    }
-
-    private static CommandFactory createCommandFactory() {
-        CommandFactory newCommandFactory = new CommandFactory() {
-            public Command createCommand(String command) {
-                LOG.debug("Received command: " + command);
-                return new ProcessShellFactory(GenericUtils.split(command, ' ')).create();
-            }
-        };
-
-        return new ScpCommandFactory.Builder().withDelegate(newCommandFactory).build();
     }
 
     /**
