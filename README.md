@@ -1,13 +1,13 @@
 #SFTPSpokesman
 
-An SFTP Server which, when connected to, provides access to Amazon S3 buckets
+An SFTP Server which -when connected to- provides access to Amazon S3 buckets
 
-#Usage
+### Usage
 
 Start as Java process
 
 ```
-mvn clean package spring-boot:run
+mvn clean package spring-boot:run -Dsftp.port=21000 -Dsftp.pubkey.file=key.pem
 ```
 
 then connect

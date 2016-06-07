@@ -14,8 +14,12 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
+ * Watcher for Sftp Events from
+ * {@link org.apache.sshd.server.subsystem.sftp.SftpSubsystem SftpSubsystem}
+ * as a
+ * {@link org.apache.sshd.server.subsystem.sftp.SftpEventListener SftpEventListener}
+ *
  * @Author rossdrew
- * @Created 17/05/16.
  */
 public class STFPWatcher implements SftpEventListener {
     static final private Logger LOG = LoggerFactory.getLogger(SftpEventListener.class);

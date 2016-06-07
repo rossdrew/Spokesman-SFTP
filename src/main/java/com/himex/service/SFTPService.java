@@ -1,29 +1,23 @@
 package com.himex.service;
 
+import com.himex.Spokesman;
+import com.himex.auth.SFTPPublicKeyAuthenticator;
 import com.himex.s3.S3FileSystemFactory;
-import org.apache.sshd.common.Factory;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.file.FileSystemFactory;
-import org.apache.sshd.common.file.virtualfs.VirtualFileSystemFactory;
 import org.apache.sshd.common.util.GenericUtils;
 import org.apache.sshd.common.util.SecurityUtils;
 import org.apache.sshd.common.util.ValidateUtils;
 import org.apache.sshd.server.Command;
-import org.apache.sshd.server.CommandFactory;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
-import org.apache.sshd.server.auth.pubkey.AcceptAllPublickeyAuthenticator;
-import org.apache.sshd.server.forward.AcceptAllForwardingFilter;
 import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
-import org.apache.sshd.server.scp.ScpCommandFactory;
 import org.apache.sshd.server.session.ServerSession;
-import org.apache.sshd.server.shell.InteractiveProcessShellFactory;
-import org.apache.sshd.server.shell.ProcessShellFactory;
-import org.apache.sshd.server.subsystem.sftp.SftpEventListener;
 import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -36,15 +30,18 @@ import java.security.PublicKey;
 import java.util.*;
 
 /**
+ * An SFTP service which provides a {@link java.nio.file.FileSystem FileSystem}
+ *
  * @Author Ross W. Drew
  */
 @Service("sftpService")
 public class SFTPService implements SpokesmanService {
     static final private Logger LOG = LoggerFactory.getLogger(SFTPService.class);
 
+    private Spokesman spokesman;
     private SshServer sshd = null;
 
-    public static SshServer createSSHServer() throws IOException {
+    public static SshServer createSSHServer(Spokesman spokesman) throws IOException {
         Map<String, String> options = new LinkedHashMap<String, String>();
         String hostKeyType = AbstractGeneratorHostKeyProvider.DEFAULT_ALGORITHM;
 
@@ -52,10 +49,11 @@ public class SFTPService implements SpokesmanService {
         Map<String, Object> props = sshd.getProperties();
         props.putAll(options);
 
-        sshd.setPort(21000);
-        sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType));
+        Integer port = spokesman.getSftpPort();
+        sshd.setPort(port);
+        sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType, spokesman));
         sshd.setPasswordAuthenticator(createPasswordAuthenticator());//Why does it need one of these is if has public key auth?
-        sshd.setPublickeyAuthenticator(AcceptAllPublickeyAuthenticator.INSTANCE);
+        sshd.setPublickeyAuthenticator(new SFTPPublicKeyAuthenticator());
 
         sshd.setSubsystemFactories(createSubsystemFactories());
         sshd.setFileSystemFactory(createFileSystemFactory());
@@ -72,7 +70,7 @@ public class SFTPService implements SpokesmanService {
 
         FileSystemFactory s3FileSystemFactory = new S3FileSystemFactory(uri);
 
-        FileSystemFactory localFileSystemFactory =  new VirtualFileSystemFactory(new File(".").toPath());
+        //FileSystemFactory localFileSystemFactory =  new VirtualFileSystemFactory(new File(".").toPath());
 
         return s3FileSystemFactory;
     }
@@ -97,12 +95,13 @@ public class SFTPService implements SpokesmanService {
         };
     }
 
-    private static AbstractGeneratorHostKeyProvider buildHostKeyProviderFromFile(String hostKeyType) throws IOException {
+    private static AbstractGeneratorHostKeyProvider buildHostKeyProviderFromFile(String hostKeyType, Spokesman properties) throws IOException {
         AbstractGeneratorHostKeyProvider hostKeyProvider;
         Path hostKeyFile;
 
         if (SecurityUtils.isBouncyCastleRegistered()) {//requires Bouncycastle dependancies
-            hostKeyFile = new File("key.pem").toPath();
+            String publicKeyFile = properties.getSftpPublicKeyFile();
+            hostKeyFile = new File(publicKeyFile).toPath();
             hostKeyProvider = SecurityUtils.createGeneratorHostKeyProvider(hostKeyFile);
         } else {
             hostKeyFile = new File("key.ser").toPath();
@@ -122,17 +121,20 @@ public class SFTPService implements SpokesmanService {
         return hostKeyProvider;
     }
 
-    public SFTPService(){
+    @Autowired
+    public SFTPService(Spokesman spokesman){
+        this.spokesman = spokesman;
+
         if (sshd != null)
             return;
 
         try {
-            sshd = createSSHServer();
+            sshd = createSSHServer(this.spokesman);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        while (sshd != null && sshd.isOpen()) {//HACKY MAKE BETTER
+        while (sshd != null && sshd.isOpen()) {//XXX HACKY MAKE BETTER
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -143,6 +145,7 @@ public class SFTPService implements SpokesmanService {
 
     @Override
     public String getStatus() {
-        return "STATUS NOT IMPLEMENTED";
+        boolean isRunning = sshd != null && sshd.isOpen();
+        return "SFTP Server :" + (isRunning ? "" : " Not") + " Running";
     }
 }
