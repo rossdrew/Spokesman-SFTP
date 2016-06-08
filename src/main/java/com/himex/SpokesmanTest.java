@@ -1,9 +1,12 @@
 package com.himex;
 
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.himex.s3.S3FileSystemFactory;
 import com.upplication.s3fs.S3Iterator;
 import com.upplication.s3fs.S3Path;
 import org.apache.sshd.common.file.FileSystemFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,6 +18,8 @@ import java.util.Arrays;
  * @Created 08/06/16.
  */
 public class SpokesmanTest {
+    static final private Logger LOG = LoggerFactory.getLogger(SpokesmanTest.class);
+
     public static void testS3fs(){
         URI uri = URI.create("s3:///s3.amazonaws.com");
 
@@ -23,9 +28,10 @@ public class SpokesmanTest {
             FileSystem s3FileSystem = s3FileSystemFactory.createFileSystem(null);
 
             printFileStores(s3FileSystem);
-
             printPathContents(s3FileSystem, "hubio-ubi-ftp");
-
+            printPathContents(s3FileSystem, "ImageTransfer");
+        } catch (AmazonS3Exception e2) {
+            LOG.error("Cannot access Amazone object: " + e2.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -46,6 +52,8 @@ public class SpokesmanTest {
 
     private static void printPathContents(FileSystem s3FileSystem, String bucket) {
         Path p = s3FileSystem.getPath("/" + bucket);
+
+        LOG.debug("Retrieving contents of " + p.toString() + "...");
 
         String contents = "";
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(p, "*")) {
