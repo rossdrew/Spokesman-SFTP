@@ -30,7 +30,7 @@ public class S3FileSystemFactory implements FileSystemFactory {
         }
 
         if (s3FileSystem == null) {
-            s3FileSystem = provider.newFileSystem(uri, new HashMap<String, Object>());
+            s3FileSystem = provider.newFileSystem(uri, new HashMap<>());
         }
 
         return s3FileSystem;
