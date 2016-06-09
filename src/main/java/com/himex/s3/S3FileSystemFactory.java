@@ -14,6 +14,8 @@ import java.util.HashMap;
  * @Author Ross W. Drew
  */
 public class S3FileSystemFactory implements FileSystemFactory {
+    public static final String PROP_USERNAME = "sftpUsername";
+
     private URI uri = URI.create("localhost");
 
     //XXX Without caching this I get FileSystemAlreadyExistsException
@@ -30,7 +32,10 @@ public class S3FileSystemFactory implements FileSystemFactory {
         }
 
         if (s3FileSystem == null) {
-            s3FileSystem = provider.newFileSystem(uri, new HashMap<>());
+            HashMap<String, Object> env = new HashMap<>();
+            env.put(PROP_USERNAME, session.getUsername());
+
+            s3FileSystem = provider.newFileSystem(uri, env);
         }
 
         return s3FileSystem;
