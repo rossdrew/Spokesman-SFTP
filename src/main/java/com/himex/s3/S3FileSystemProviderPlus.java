@@ -14,9 +14,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import static com.upplication.s3fs.AmazonS3Factory.ACCESS_KEY;
-import static com.upplication.s3fs.AmazonS3Factory.SECRET_KEY;
-
 
 /**
  * Overriding S3FileSystemProvider to provide a FileChannel option (via newFileChannel())
@@ -24,7 +21,7 @@ import static com.upplication.s3fs.AmazonS3Factory.SECRET_KEY;
  *
  * @Author Ross W. Drew
  */
-public class S3FileSystemProviderWithFileChannel extends S3FileSystemProvider {
+public class S3FileSystemProviderPlus extends S3FileSystemProvider {
     /**
      * Just a FileChannel interface that points to a SeekableByteChannel
      */
@@ -54,7 +51,9 @@ public class S3FileSystemProviderWithFileChannel extends S3FileSystemProvider {
         Map<String, Object> attributeMap = super.readAttributes(path, attributes, options);
 
         if (attributeMap != null) {
-            //XXX Hack as I have no idea how to get Amazon permissions as S3ObjectSummary (Amazon AWS SDK) doesn't contain any
+            //XXX Hack as I have no idea how to get the equivalent of Amazon permissions as
+            //    S3ObjectSummary (Amazon AWS SDK) doesn't contain any and Apche MINA SSHD
+            //    requires 'permissions' which are normally specific to POSIX
             attributeMap.put("permissions", PosixFilePermissions.fromString("rw-rw----"));
         }
 
@@ -62,9 +61,9 @@ public class S3FileSystemProviderWithFileChannel extends S3FileSystemProvider {
     }
 
     /**
-     * Overriden to provide S3UserAwareFileSystem rather than S3FileSystem
+     * Overriden to provide S3FileSystemPlus rather than S3FileSystem
      */
     protected S3FileSystem createFileSystem(URI uri, Properties props) {
-        return new S3UserAwareFileSystem(this, getFileSystemKey(uri, props), getAmazonS3(uri, props), uri.getHost());
+        return new S3FileSystemPlus(this, getFileSystemKey(uri, props), getAmazonS3(uri, props), uri.getHost());
     }
 }
