@@ -1,17 +1,21 @@
 package com.himex.s3;
 
 import com.google.common.base.Preconditions;
+import com.upplication.s3fs.S3FileSystem;
 import com.upplication.s3fs.S3FileSystemProvider;
 import com.upplication.s3fs.S3Path;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.channels.FileChannel;
-import java.nio.file.LinkOption;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+
+import static com.upplication.s3fs.AmazonS3Factory.ACCESS_KEY;
+import static com.upplication.s3fs.AmazonS3Factory.SECRET_KEY;
 
 
 /**
@@ -42,6 +46,9 @@ public class S3FileSystemProviderWithFileChannel extends S3FileSystemProvider {
         return (S3Path) path;
     }
 
+    /**
+     * Overriden to provide 'permissions attribute
+     */
     @Override
     public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
         Map<String, Object> attributeMap = super.readAttributes(path, attributes, options);
@@ -52,5 +59,12 @@ public class S3FileSystemProviderWithFileChannel extends S3FileSystemProvider {
         }
 
         return attributeMap;
+    }
+
+    /**
+     * Overriden to provide S3UserAwareFileSystem rather than S3FileSystem
+     */
+    protected S3FileSystem createFileSystem(URI uri, Properties props) {
+        return new S3UserAwareFileSystem(this, getFileSystemKey(uri, props), getAmazonS3(uri, props), uri.getHost());
     }
 }
