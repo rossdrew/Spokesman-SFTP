@@ -27,6 +27,8 @@ import static com.upplication.s3fs.AmazonS3Factory.SECRET_KEY;
  * @Author Ross W. Drew
  */
 public class S3FileSystemProviderPlus extends S3FileSystemProvider {
+    public static final String PROP_USERNAME = "sftpUsername";
+
     /**
      * Just a FileChannel interface that points to a SeekableByteChannel
      */
@@ -61,7 +63,7 @@ public class S3FileSystemProviderPlus extends S3FileSystemProvider {
      * Overidden to provide S3FileSystemPlus rather than S3FileSystem
      */
     protected S3FileSystem createFileSystem(URI uri, Properties props) {
-        return new S3FileSystemPlus(this, getFileSystemKey(uri, props), getAmazonS3(uri, props), uri.getHost());
+        return new S3FileSystemPlus(this, getFileSystemKey(uri, props), getAmazonS3(uri, props), uri.getHost(), props.getProperty(PROP_USERNAME));
     }
 
     /**
