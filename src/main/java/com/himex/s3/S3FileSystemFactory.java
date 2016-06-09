@@ -30,9 +30,6 @@ public class S3FileSystemFactory implements FileSystemFactory {
         }
 
         if (s3FileSystem == null) {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-            //s3FileSystem = FileSystems.newFileSystem(uri, new HashMap<String, Object>(), classLoader);
             s3FileSystem = provider.newFileSystem(uri, new HashMap<String, Object>());
         }
 
