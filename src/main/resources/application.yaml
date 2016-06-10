@@ -1,0 +1,10 @@
+users:
+  rossdrew:
+    home: hubio-ubi-ftp
+  justin:
+    home: fdsfdss
+
+#logging:level.com.himex=TRACE
+#logging.level.org.apache.sshd=TRACE
+#logging.level.com.amazonaws=TRACE
+#logging.level.com.upplication=TRACE
