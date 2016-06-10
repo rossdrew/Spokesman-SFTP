@@ -28,6 +28,7 @@ import static com.upplication.s3fs.AmazonS3Factory.SECRET_KEY;
  */
 public class S3FileSystemProviderPlus extends S3FileSystemProvider {
     public static final String PROP_USERNAME = "sftpUsername";
+    public static final String PROP_USERHOME = "sftpUserHome";
 
     /**
      * Just a FileChannel interface that points to a SeekableByteChannel
@@ -63,7 +64,7 @@ public class S3FileSystemProviderPlus extends S3FileSystemProvider {
      * Overidden to provide S3FileSystemPlus rather than S3FileSystem
      */
     protected S3FileSystem createFileSystem(URI uri, Properties props) {
-        return new S3FileSystemPlus(this, getFileSystemKey(uri, props), getAmazonS3(uri, props), uri.getHost(), props.getProperty(PROP_USERNAME));
+        return new S3FileSystemPlus(this, getFileSystemKey(uri, props), getAmazonS3(uri, props), uri.getHost(), props.getProperty(PROP_USERHOME));
     }
 
     /**
@@ -90,7 +91,7 @@ public class S3FileSystemProviderPlus extends S3FileSystemProvider {
     }
 
     /**
-     * XXX Overidden and copied as it's private and newFileChannel() relies on it
+     * XXX Overidden and copied as it's private and newFileChannel() (which we've overidden) relies on it
      */
     private S3Path toS3Path(Path path) {
         Preconditions.checkArgument(path instanceof S3Path, "path must be an instance of %s", S3Path.class.getName());
@@ -98,7 +99,7 @@ public class S3FileSystemProviderPlus extends S3FileSystemProvider {
     }
 
     /**
-     * XXX Overidden and copied as it's private and newFileSystem() relies on it
+     * XXX Overidden and copied as it's private and newFileSystem() (which we've overidden) relies on it
      */
     private Properties getProperties(URI uri, Map<String, ?> env) {
         Properties props = loadAmazonProperties();
@@ -117,7 +118,7 @@ public class S3FileSystemProviderPlus extends S3FileSystemProvider {
     }
 
     /**
-     * XXX Overidden and copied as it's private and newFileSystem() relies on it
+     * XXX Overidden and copied as it's private and newFileSystem() (which we've overidden) relies on it
      */
     private void validateProperties(Properties props) {
         Preconditions.checkArgument(

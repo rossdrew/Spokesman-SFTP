@@ -34,14 +34,15 @@ import java.util.*;
  *
  * @Author Ross W. Drew
  */
-@Service("sftpService")
+@Service
 public class SFTPService implements SpokesmanService {
     static final private Logger LOG = LoggerFactory.getLogger(SFTPService.class);
 
     private Spokesman spokesman;
+    private FileSystemFactory s3FileSystemFactory;
     private SshServer sshd = null;
 
-    public static SshServer createSSHServer(Spokesman spokesman) throws IOException {
+    public SshServer createSSHServer(Spokesman spokesman) throws IOException {
         Map<String, String> options = new LinkedHashMap<String, String>();
         String hostKeyType = AbstractGeneratorHostKeyProvider.DEFAULT_ALGORITHM;
 
@@ -63,18 +64,11 @@ public class SFTPService implements SpokesmanService {
         return sshd;
     }
 
-    private static FileSystemFactory createFileSystemFactory() {
-        //XXX speed up by putting in the correct region
-        URI uri = URI.create("s3:///s3.amazonaws.com");
-
-        FileSystemFactory s3FileSystemFactory = new S3FileSystemFactory(uri);
-
-        //FileSystemFactory localFileSystemFactory =  new VirtualFileSystemFactory(new File(".").toPath());
-
+    private FileSystemFactory createFileSystemFactory() {
         return s3FileSystemFactory;
     }
 
-    private static List<NamedFactory<Command>> createSubsystemFactories() {
+    private List<NamedFactory<Command>> createSubsystemFactories() {
         List<NamedFactory<Command>> subsystemFactories = new ArrayList<NamedFactory<Command>>(1);
         SftpSubsystemFactory factory = new SftpSubsystemFactory();
         //factory.addSftpEventListener(new STFPWatcher());
@@ -86,7 +80,7 @@ public class SFTPService implements SpokesmanService {
     /**
      * XXX FOR DEBUG ONLY : Just makes sure the password is the same as the username
      */
-    private static PasswordAuthenticator createPasswordAuthenticator() {
+    private PasswordAuthenticator createPasswordAuthenticator() {
         return new PasswordAuthenticator() {
             public boolean authenticate(String username, String password, ServerSession session) {
                 LOG.info("Login from " + username + "@" + session.getClientAddress());
@@ -95,7 +89,7 @@ public class SFTPService implements SpokesmanService {
         };
     }
 
-    private static AbstractGeneratorHostKeyProvider buildHostKeyProviderFromFile(String hostKeyType, Spokesman properties) throws IOException {
+    private AbstractGeneratorHostKeyProvider buildHostKeyProviderFromFile(String hostKeyType, Spokesman properties) throws IOException {
         AbstractGeneratorHostKeyProvider hostKeyProvider;
         Path hostKeyFile;
 
@@ -121,9 +115,12 @@ public class SFTPService implements SpokesmanService {
         return hostKeyProvider;
     }
 
+
+
     @Autowired
-    public SFTPService(Spokesman spokesman){
+    public SFTPService(Spokesman spokesman, FileSystemFactory s3FileSystemFactory){
         this.spokesman = spokesman;
+        this.s3FileSystemFactory = s3FileSystemFactory;
 
         if (sshd != null)
             return;
