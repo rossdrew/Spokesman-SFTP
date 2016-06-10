@@ -1,21 +1,17 @@
-package com.himex.user;
+package com.himex;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @Author rossdrew
- * @Created 10/06/16.
- */
-@ConfigurationProperties
 @Configuration
-public class AmazonProperties {
+@ConfigurationProperties
+public class SpokesmanProperties {
     private Map<String, UserConfig> users = new HashMap<>();
+    private URI amazonURI;
 
     public static class UserConfig {
         private String home;
@@ -38,5 +34,13 @@ public class AmazonProperties {
 
     public Map<String, UserConfig> getUsers() {
         return users;
+    }
+
+    public URI getAmazonURI() {
+        return amazonURI;
+    }
+
+    public void setAmazonURI(String amazonURI) {
+        this.amazonURI = URI.create(amazonURI);
     }
 }
