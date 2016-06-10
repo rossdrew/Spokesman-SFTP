@@ -1,13 +1,12 @@
 package com.himex.s3;
 
-import com.himex.user.AmazonProperties;
+import com.himex.SpokesmanProperties;
 import org.apache.sshd.common.file.FileSystemFactory;
 import org.apache.sshd.common.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.FileSystem;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,17 +18,14 @@ import java.util.Map;
  */
 @Component
 public class S3FileSystemFactory implements FileSystemFactory {
-    private URI uri = URI.create("s3:///s3.amazonaws.com");
-
-    //XXX Without caching this I get FileSystemAlreadyExistsException
-    private FileSystem s3FileSystem = null;
     private S3FileSystemProviderPlus provider;
-
-    private AmazonProperties amazonProperties;
+    private Map<String, FileSystem> userFileSystems = new HashMap<>();
+    
+    private SpokesmanProperties spokesmanProperties;
 
     @Autowired
-    public S3FileSystemFactory(AmazonProperties amazonProperties) {
-        this.amazonProperties = amazonProperties;
+    public S3FileSystemFactory(SpokesmanProperties spokesmanProperties) {
+        this.spokesmanProperties = spokesmanProperties;
     }
 
     public FileSystem createFileSystem(Session session) throws IOException {
@@ -37,17 +33,18 @@ public class S3FileSystemFactory implements FileSystemFactory {
             provider = new S3FileSystemProviderPlus();
         }
 
-        if (s3FileSystem == null) {
+        String username = session.getUsername();
+        if (!userFileSystems.containsKey(username)){
             HashMap<String, Object> env = new HashMap<>();
-            env.put(S3FileSystemProviderPlus.PROP_USERNAME, session.getUsername());
+            env.put(S3FileSystemProviderPlus.PROP_USERNAME, username);
 
-            Map<String, AmazonProperties.UserConfig> users = amazonProperties.getUsers();
-            AmazonProperties.UserConfig userConfig = users.get(env.get(S3FileSystemProviderPlus.PROP_USERNAME));
+            Map<String, SpokesmanProperties.UserConfig> users = spokesmanProperties.getUsers();
+            SpokesmanProperties.UserConfig userConfig = users.get(env.get(S3FileSystemProviderPlus.PROP_USERNAME));
             env.put(S3FileSystemProviderPlus.PROP_USERHOME, userConfig.getHome());
 
-            s3FileSystem = provider.newFileSystem(uri, env);
+            userFileSystems.put(username, provider.newFileSystem(spokesmanProperties.getAmazonURI(), env));
         }
 
-        return s3FileSystem;
+        return userFileSystems.get(username);
     }
 }
