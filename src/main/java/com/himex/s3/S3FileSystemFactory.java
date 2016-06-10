@@ -20,7 +20,7 @@ import java.util.Map;
 public class S3FileSystemFactory implements FileSystemFactory {
     private S3FileSystemProviderPlus provider;
     private Map<String, FileSystem> userFileSystems = new HashMap<>();
-    
+
     private SpokesmanProperties spokesmanProperties;
 
     @Autowired
@@ -35,16 +35,25 @@ public class S3FileSystemFactory implements FileSystemFactory {
 
         String username = session.getUsername();
         if (!userFileSystems.containsKey(username)){
-            HashMap<String, Object> env = new HashMap<>();
-            env.put(S3FileSystemProviderPlus.PROP_USERNAME, username);
-
-            Map<String, SpokesmanProperties.UserConfig> users = spokesmanProperties.getUsers();
-            SpokesmanProperties.UserConfig userConfig = users.get(env.get(S3FileSystemProviderPlus.PROP_USERNAME));
-            env.put(S3FileSystemProviderPlus.PROP_USERHOME, userConfig.getHome());
-
-            userFileSystems.put(username, provider.newFileSystem(spokesmanProperties.getAmazonURI(), env));
+            HashMap<String, Object> additionalProperties = buildAdditionalProperties(username);
+            FileSystem newFileSystem = provider.newFileSystem(spokesmanProperties.getAmazonURI(), additionalProperties);
+            userFileSystems.put(username, newFileSystem);
         }
 
         return userFileSystems.get(username);
+    }
+
+    /**
+     * Build list of optional properties for username, e.g. username and home directory
+     */
+    private HashMap<String, Object> buildAdditionalProperties(String username) {
+        HashMap<String, Object> additionalProperties = new HashMap<>();
+        additionalProperties.put(S3FileSystemProviderPlus.PROP_USERNAME, username);
+
+        Map<String, SpokesmanProperties.UserConfig> users = spokesmanProperties.getUsers();
+        SpokesmanProperties.UserConfig userConfig = users.get(additionalProperties.get(S3FileSystemProviderPlus.PROP_USERNAME));
+        additionalProperties.put(S3FileSystemProviderPlus.PROP_USERHOME, userConfig.getHome());
+
+        return additionalProperties;
     }
 }
