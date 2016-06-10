@@ -27,9 +27,9 @@ public class BaseController {
     public String health() {
         String servicesStates = "";
         for (String serviceKey : services.keySet()){
-            servicesStates += "" + serviceKey + " : " + services.get(serviceKey).getStatus();
+            servicesStates += "\n" + serviceKey + " : " + services.get(serviceKey).getStatus();
         }
 
-        return "SFTP Spokesman running.\n";
+        return "Services\n--------\n" + servicesStates;
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class S3FileSystemPlus extends S3FileSystem {
     private AmazonS3 client;
-    private String homeDirectory = "unknown";
+    private String homeDirectory;
 
     public S3FileSystemPlus(S3FileSystemProvider provider, String key, AmazonS3 client, String endpoint, String userhome) {
         super(provider, key, client, endpoint);

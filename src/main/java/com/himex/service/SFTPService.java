@@ -1,11 +1,9 @@
 package com.himex.service;
 
-import com.himex.Spokesman;
 import com.himex.auth.SFTPPublicKeyAuthenticator;
-import com.himex.s3.S3FileSystemFactory;
+import com.himex.SpokesmanProperties;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.file.FileSystemFactory;
-import org.apache.sshd.common.util.GenericUtils;
 import org.apache.sshd.common.util.SecurityUtils;
 import org.apache.sshd.common.util.ValidateUtils;
 import org.apache.sshd.server.Command;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyPair;
@@ -38,11 +35,11 @@ import java.util.*;
 public class SFTPService implements SpokesmanService {
     static final private Logger LOG = LoggerFactory.getLogger(SFTPService.class);
 
-    private Spokesman spokesman;
+    private SpokesmanProperties spokesmanProperties;
     private FileSystemFactory s3FileSystemFactory;
     private SshServer sshd = null;
 
-    public SshServer createSSHServer(Spokesman spokesman) throws IOException {
+    public SshServer createSSHServer(SpokesmanProperties spokesmanProperties) throws IOException {
         Map<String, String> options = new LinkedHashMap<String, String>();
         String hostKeyType = AbstractGeneratorHostKeyProvider.DEFAULT_ALGORITHM;
 
@@ -50,9 +47,9 @@ public class SFTPService implements SpokesmanService {
         Map<String, Object> props = sshd.getProperties();
         props.putAll(options);
 
-        Integer port = spokesman.getSftpPort();
+        Integer port = spokesmanProperties.getSftpConfig().getPort();
         sshd.setPort(port);
-        sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType, spokesman));
+        sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType, spokesmanProperties));
         sshd.setPasswordAuthenticator(createPasswordAuthenticator());//Why does it need one of these is if has public key auth?
         sshd.setPublickeyAuthenticator(new SFTPPublicKeyAuthenticator());
 
@@ -89,12 +86,12 @@ public class SFTPService implements SpokesmanService {
         };
     }
 
-    private AbstractGeneratorHostKeyProvider buildHostKeyProviderFromFile(String hostKeyType, Spokesman properties) throws IOException {
-        AbstractGeneratorHostKeyProvider hostKeyProvider;
+    private AbstractGeneratorHostKeyProvider buildHostKeyProviderFromFile(String hostKeyType, SpokesmanProperties properties) throws IOException {
         Path hostKeyFile;
+        AbstractGeneratorHostKeyProvider hostKeyProvider;
 
         if (SecurityUtils.isBouncyCastleRegistered()) {//requires Bouncycastle dependancies
-            String publicKeyFile = properties.getSftpPublicKeyFile();
+            String publicKeyFile = properties.getSftpConfig().getPublicKeyFile();
             hostKeyFile = new File(publicKeyFile).toPath();
             hostKeyProvider = SecurityUtils.createGeneratorHostKeyProvider(hostKeyFile);
         } else {
@@ -115,18 +112,16 @@ public class SFTPService implements SpokesmanService {
         return hostKeyProvider;
     }
 
-
-
     @Autowired
-    public SFTPService(Spokesman spokesman, FileSystemFactory s3FileSystemFactory){
-        this.spokesman = spokesman;
+    public SFTPService(FileSystemFactory s3FileSystemFactory, SpokesmanProperties props){
+        this.spokesmanProperties = props;
         this.s3FileSystemFactory = s3FileSystemFactory;
 
         if (sshd != null)
             return;
 
         try {
-            sshd = createSSHServer(this.spokesman);
+            sshd = createSSHServer(this.spokesmanProperties);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -17,31 +17,6 @@ import org.springframework.context.ApplicationContext;
 public class Spokesman {
     static final private Logger LOG = LoggerFactory.getLogger(Spokesman.class);
 
-    private String sftpPublicKeyFile = null;
-    private Integer sftpPort = null;
-
-    public Integer getSftpPort() {
-        if (sftpPort == null){
-            String tmp = System.getProperty("sftp.port");
-            sftpPort = Integer.parseInt(tmp);
-        }
-
-        return sftpPort;
-    }
-
-    public String getSftpPublicKeyFile() {
-        if (sftpPublicKeyFile == null){
-            sftpPublicKeyFile = System.getProperty("sftp.pubkey.file");
-        }
-
-        return sftpPublicKeyFile;
-    }
-
-    public void markForRefresh(){
-        sftpPublicKeyFile = null;
-        sftpPort = null;
-    }
-
     public static void main(String[] args) {
         LOG.debug("Starting Spokesman via Spring Boot...");
 

@@ -1,10 +1,18 @@
+amazonURI: s3:///s3.amazonaws.com
+
+#SFTP Connection config
+sftpConfig:
+  port: 21000
+  publicKeyFile: key.pem
+
+#SFTP Users and their S3 home buckets
 users:
   rossdrew:
     home: hubio-ubi-ftp
   justin:
-    home: fdsfdss
+    home: hubio-ubi-ftp
 
 #logging:level.com.himex=TRACE
-#logging.level.org.apache.sshd=TRACE
+#logging.level.org.apache.sshd=TRACEe
 #logging.level.com.amazonaws=TRACE
 #logging.level.com.upplication=TRACE
