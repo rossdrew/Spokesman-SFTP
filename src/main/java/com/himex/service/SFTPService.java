@@ -1,6 +1,5 @@
 package com.himex.service;
 
-import com.himex.auth.SFTPPublicKeyAuthenticator;
 import com.himex.SpokesmanProperties;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.file.FileSystemFactory;
