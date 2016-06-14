@@ -3,7 +3,7 @@ amazonURI: s3:///s3.amazonaws.com
 #SFTP Connection config
 sftpConfig:
   port: 21000
-  publicKeyFile: key.pem
+  publicKeyFile: key2.pem.pub
 
 #SFTP Users and their S3 home buckets
 users:
@@ -12,7 +12,5 @@ users:
   justin:
     home: hubio-ubi-ftp
 
-#logging:level.com.himex=TRACE
-#logging.level.org.apache.sshd=TRACEe
-#logging.level.com.amazonaws=TRACE
-#logging.level.com.upplication=TRACE
+server:
+  port: 8080
