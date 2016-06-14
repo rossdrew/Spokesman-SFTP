@@ -1,4 +1,4 @@
-package com.himex.service;
+package com.himex.service.watch;
 
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.subsystem.sftp.DirectoryHandle;

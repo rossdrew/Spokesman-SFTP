@@ -8,7 +8,12 @@ import org.apache.sshd.common.util.SecurityUtils;
 import org.apache.sshd.common.util.ValidateUtils;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.auth.UserAuth;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
+import org.apache.sshd.server.auth.password.UserAuthPasswordFactory;
+import org.apache.sshd.server.auth.pubkey.UserAuthPublicKey;
+import org.apache.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
+import org.apache.sshd.server.config.keys.AuthorizedKeysAuthenticator;
 import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
@@ -51,7 +56,11 @@ public class SFTPService implements SpokesmanService {
         sshd.setPort(port);
         sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType, spokesmanProperties));
         sshd.setPasswordAuthenticator(createPasswordAuthenticator());//Why does it need one of these is if has public key auth?
-        sshd.setPublickeyAuthenticator(new SFTPPublicKeyAuthenticator());
+
+        sshd.setPublickeyAuthenticator(new AuthorizedKeysAuthenticator(new File("authorized_keys")));
+        List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>();
+        userAuthFactories.add(UserAuthPublicKeyFactory.INSTANCE); // <<<--- denies all keys?!
+        sshd.setUserAuthFactories(userAuthFactories);
 
         sshd.setSubsystemFactories(createSubsystemFactories());
         sshd.setFileSystemFactory(createFileSystemFactory());
@@ -80,8 +89,11 @@ public class SFTPService implements SpokesmanService {
     private PasswordAuthenticator createPasswordAuthenticator() {
         return new PasswordAuthenticator() {
             public boolean authenticate(String username, String password, ServerSession session) {
-                LOG.info("Login from " + username + "@" + session.getClientAddress());
-                return true;//(GenericUtils.length(username) > 0) && username.equals(password);
+                boolean validLogin = true;
+
+                LOG.info((!validLogin ? "Failed l" : "L") + "ogin from " + username + "@" + session.getClientAddress());
+
+                return validLogin;//(GenericUtils.length(username) > 0) && username.equals(password);
             }
         };
     }
