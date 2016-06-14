@@ -11,8 +11,7 @@ import java.nio.file.FileStore;
 import java.util.List;
 
 /**
- * @Author rossdrew
- * @Created 09/06/16.
+ * Extends {@link com.upplication.s3fs.S3FileSystem S3FileSystem} to limit directories shown by user
  */
 public class S3FileSystemPlus extends S3FileSystem {
     private AmazonS3 client;
