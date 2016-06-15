@@ -1,0 +1,8 @@
+SFTP Spokesman.iml
+
+.idea
+target
+
+src/main/resources/keys/hostKey
+src/main/resources/keys/hostKey.pub
+src/main/resources/amazon.properties
