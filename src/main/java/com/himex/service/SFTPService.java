@@ -58,7 +58,7 @@ public class SFTPService implements SpokesmanService {
         SpokesmanProperties.SftpConfig sftpConfig = spokesmanProperties.getSftpConfig();
         sshd.setPublickeyAuthenticator(new AuthorizedKeysAuthenticator(sftpConfig.getAuthorizedKeysFile()));
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>();
-        userAuthFactories.add(UserAuthPublicKeyFactory.INSTANCE); // <<<--- denies all keys?!
+        userAuthFactories.add(UserAuthPublicKeyFactory.INSTANCE);
         sshd.setUserAuthFactories(userAuthFactories);
 
         sshd.setSubsystemFactories(createSubsystemFactories());
