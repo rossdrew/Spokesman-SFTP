@@ -3,7 +3,9 @@ amazonURI: s3:///s3.amazonaws.com
 #SFTP Connection config
 sftpConfig:
   port: 21000
-  publicKeyFile: key2.pem.pub
+  publicKeyFile: providedKey.pem.pub
+authorizedKeysFile:
+  src/main/resources/authorized_keys
 
 #SFTP Users and their S3 home buckets
 users:
