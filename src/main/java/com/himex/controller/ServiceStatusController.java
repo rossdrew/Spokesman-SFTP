@@ -3,18 +3,18 @@ package com.himex.controller;
 import com.himex.service.SFTPService;
 import com.himex.service.SpokesmanService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Essentially a health endpoint...TODO that doesn't work at the moment
+ * Essentially an endpoint that reports the state of running services
+ * TODO doesn't work at the moment
  *
  * @Author Ross W. Drew
  */
-@Controller
+//@Controller
 public class ServiceStatusController {
     private Map<String, SpokesmanService> services = new HashMap<>();
 
