@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A FileSystemFactory for creating Amazon S3 Filesystem
+ * A FileSystemFactory for creating Amazon S3 {@link java.nio.file.FileSystem FileSystem}
  *
  * @Author Ross W. Drew
  */
