@@ -21,6 +21,5 @@ public class Spokesman {
         LOG.debug("Starting Spokesman via Spring Boot...");
 
         ApplicationContext ctx = SpringApplication.run(Spokesman.class, args);
-        //SpokesmanTest.testS3fs();
     }
 }
