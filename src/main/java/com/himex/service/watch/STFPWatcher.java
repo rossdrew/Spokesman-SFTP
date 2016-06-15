@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Watcher for Sftp Events from
+ * Watcher for (debug of) Sftp Events from
  * {@link org.apache.sshd.server.subsystem.sftp.SftpSubsystem SftpSubsystem}
  * as a
  * {@link org.apache.sshd.server.subsystem.sftp.SftpEventListener SftpEventListener}
