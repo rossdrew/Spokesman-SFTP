@@ -31,7 +31,7 @@ import java.security.PublicKey;
 import java.util.*;
 
 /**
- * An SFTP service which provides a {@link java.nio.file.FileSystem FileSystem}
+ * An SFTP service using Apache MINA SSHD which provides a {@link java.nio.file.FileSystem FileSystem}
  *
  * @Author Ross W. Drew
  */
@@ -53,10 +53,10 @@ public class SFTPService implements SpokesmanService {
 
         Integer port = spokesmanProperties.getSftpConfig().getPort();
         sshd.setPort(port);
-        sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType, spokesmanProperties));
-        sshd.setPasswordAuthenticator(createPasswordAuthenticator());//Why does it need one of these is if has public key auth?
+        sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType, spokesmanProperties));//XXX Why does it need this if I have a publicKeyAuthenticator
+        sshd.setPasswordAuthenticator(createPasswordAuthenticator());//XXX Not used if PublickeyAuthenticator is setup
 
-        sshd.setPublickeyAuthenticator(new AuthorizedKeysAuthenticator(new File("authorized_keys")));
+        sshd.setPublickeyAuthenticator(new AuthorizedKeysAuthenticator(spokesmanProperties.getAuthorizedKeysFile()));
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>();
         userAuthFactories.add(UserAuthPublicKeyFactory.INSTANCE); // <<<--- denies all keys?!
         sshd.setUserAuthFactories(userAuthFactories);

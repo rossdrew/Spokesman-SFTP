@@ -1,18 +1,27 @@
 package com.himex;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.File;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Single point of application properties, spring boot loaded from application.yml
+ */
 @Configuration
 @ConfigurationProperties
 public class SpokesmanProperties {
+    static final private Logger LOG = LoggerFactory.getLogger(SpokesmanProperties.class);
+
     private Map<String, UserConfig> users = new HashMap<>();
     private URI amazonURI;
     private SftpConfig sftpConfig;
+    private File authorizedKeysFile;
 
     public static class UserConfig {
         private String home;
@@ -76,5 +85,16 @@ public class SpokesmanProperties {
 
     public Map<String, UserConfig> getUsers() {
         return users;
+    }
+
+    public void setAuthorizedKeysFile(String authorizedKeysFileName){
+        authorizedKeysFile = new java.io.File(authorizedKeysFileName);
+        if (!authorizedKeysFile.exists()){
+           LOG.error("Cannot find authorized keys file '" + authorizedKeysFileName + "'");
+        }
+    }
+
+    public File getAuthorizedKeysFile(){
+        return authorizedKeysFile;
     }
 }
