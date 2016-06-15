@@ -9,8 +9,6 @@ import org.apache.sshd.server.Command;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuth;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
-import org.apache.sshd.server.auth.password.UserAuthPasswordFactory;
-import org.apache.sshd.server.auth.pubkey.UserAuthPublicKey;
 import org.apache.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
 import org.apache.sshd.server.config.keys.AuthorizedKeysAuthenticator;
 import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
@@ -53,8 +51,8 @@ public class SFTPService implements SpokesmanService {
 
         Integer port = spokesmanProperties.getSftpConfig().getPort();
         sshd.setPort(port);
-        sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType, spokesmanProperties));//XXX Why does it need this if I have a publicKeyAuthenticator
-        sshd.setPasswordAuthenticator(createPasswordAuthenticator());//XXX Not used if PublickeyAuthenticator is setup
+        sshd.setKeyPairProvider(buildHostKeyProviderFromFile(hostKeyType, spokesmanProperties));
+        sshd.setPasswordAuthenticator(createPasswordAuthenticator());
 
         sshd.setPublickeyAuthenticator(new AuthorizedKeysAuthenticator(spokesmanProperties.getAuthorizedKeysFile()));
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>();
@@ -84,6 +82,7 @@ public class SFTPService implements SpokesmanService {
 
     /**
      * XXX FOR DEBUG ONLY : Just makes sure the password is the same as the username
+     *                      Not used if PublickeyAuthenticator is setup
      */
     private PasswordAuthenticator createPasswordAuthenticator() {
         return new PasswordAuthenticator() {
@@ -97,6 +96,9 @@ public class SFTPService implements SpokesmanService {
         };
     }
 
+    /**
+     * Host key provider: used for verifying the identity of this server
+     */
     private AbstractGeneratorHostKeyProvider buildHostKeyProviderFromFile(String hostKeyType, SpokesmanProperties properties) throws IOException {
         Path hostKeyFile;
         AbstractGeneratorHostKeyProvider hostKeyProvider;
