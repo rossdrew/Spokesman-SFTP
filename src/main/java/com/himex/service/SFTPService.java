@@ -29,7 +29,8 @@ import java.security.PublicKey;
 import java.util.*;
 
 /**
- * An SFTP service using Apache MINA SSHD which provides a {@link java.nio.file.FileSystem FileSystem}
+ * An SFTP service using Apache MINA SSHD which provides a {@link java.nio.file.FileSystem FileSystem} using
+ * {@link com.himex.s3.S3FileSystemFactory S3FileSystemFactory}
  *
  * @Author Ross W. Drew
  */
