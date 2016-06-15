@@ -21,7 +21,6 @@ public class SpokesmanProperties {
     private Map<String, UserConfig> users = new HashMap<>();
     private URI amazonURI;
     private SftpConfig sftpConfig;
-    private File authorizedKeysFile;
 
     public static class UserConfig {
         private String home;
@@ -41,6 +40,7 @@ public class SpokesmanProperties {
     public static class SftpConfig{
         private Integer port;
         private String publicKeyFile;
+        private File authorizedKeysFile;
 
         public Integer getPort() {
             return port;
@@ -56,6 +56,17 @@ public class SpokesmanProperties {
 
         public void setPublicKeyFile(String publicKeyFile) {
             this.publicKeyFile = publicKeyFile;
+        }
+
+        public void setAuthorizedKeysFile(String authorizedKeysFileName){
+            authorizedKeysFile = new java.io.File(authorizedKeysFileName);
+            if (!authorizedKeysFile.exists()){
+                LOG.error("Cannot find authorized keys file '" + authorizedKeysFileName + "'");
+            }
+        }
+
+        public File getAuthorizedKeysFile(){
+            return authorizedKeysFile;
         }
     }
 
@@ -85,16 +96,5 @@ public class SpokesmanProperties {
 
     public Map<String, UserConfig> getUsers() {
         return users;
-    }
-
-    public void setAuthorizedKeysFile(String authorizedKeysFileName){
-        authorizedKeysFile = new java.io.File(authorizedKeysFileName);
-        if (!authorizedKeysFile.exists()){
-           LOG.error("Cannot find authorized keys file '" + authorizedKeysFileName + "'");
-        }
-    }
-
-    public File getAuthorizedKeysFile(){
-        return authorizedKeysFile;
     }
 }
