@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
  * @Author rossdrew
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TestS3FileSystemFactory {
+public class S3FileSystemFactoryTest {
     private S3FileSystemFactory factory;
 
     @Mock
