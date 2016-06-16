@@ -24,15 +24,12 @@ public class S3FileSystemFactory implements FileSystemFactory {
     private SpokesmanProperties spokesmanProperties;
 
     @Autowired
-    public S3FileSystemFactory(SpokesmanProperties spokesmanProperties) {
+    public S3FileSystemFactory(SpokesmanProperties spokesmanProperties, S3FileSystemProviderPlus provider) {
         this.spokesmanProperties = spokesmanProperties;
+        this.provider = provider;
     }
 
     public FileSystem createFileSystem(Session session) throws IOException {
-        if (provider == null){
-            provider = new S3FileSystemProviderPlus();
-        }
-
         String username = session.getUsername();
         if (!userFileSystems.containsKey(username)){
             HashMap<String, Object> additionalProperties = buildAdditionalProperties(username);
@@ -52,7 +49,9 @@ public class S3FileSystemFactory implements FileSystemFactory {
 
         Map<String, SpokesmanProperties.UserConfig> users = spokesmanProperties.getUsers();
         SpokesmanProperties.UserConfig userConfig = users.get(additionalProperties.get(S3FileSystemProviderPlus.PROP_USERNAME));
-        additionalProperties.put(S3FileSystemProviderPlus.PROP_USERHOME, userConfig.getHome());
+        if (userConfig != null) {
+            additionalProperties.put(S3FileSystemProviderPlus.PROP_USERHOME, userConfig.getHome());
+        }
 
         return additionalProperties;
     }
