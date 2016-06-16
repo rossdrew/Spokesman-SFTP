@@ -1,4 +1,4 @@
-package com.himex;
+package com.himex.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.Bucket;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
  * @Author rossdrew
  */
 @RunWith(MockitoJUnitRunner.class)
-public class s3S3FileSystemPlusTest {
+public class S3FileSystemPlusTest {
     private S3FileSystemPlus fileSystem;
 
     @Mock
