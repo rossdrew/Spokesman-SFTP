@@ -14,7 +14,7 @@ import java.util.Set;
  * A
  * {@link java.nio.channels.FileChannel FileChannel}
  * that simply directs calls to
- * {@link com.upplication.s3fs.S3SeekablBytechannle S3SeekablBytechannel}
+ * {@link com.upplication.s3fs.S3SeekableByteChannel S3SeekablBytechannel}
  * so that Apache MINA can work with s3fs
  *
  * @Author Ross W. Drew

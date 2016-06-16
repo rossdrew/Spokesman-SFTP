@@ -10,7 +10,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileSystem;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,8 +49,6 @@ public class TestS3FileSystemFactory {
         when(mockSession.getUsername()).thenReturn("testUsername");
         when(mockProperties.getUsers()).thenReturn(users);
 
-        FileSystem newFileSystem = factory.createFileSystem(mockSession);
-
         verify(mockProvider).newFileSystem(any(URI.class),
                 (Map<String, ?>)argThat(hasEntry(S3FileSystemProviderPlus.PROP_USERNAME, "testUsername")));
         verify(mockProvider).newFileSystem(any(URI.class),
@@ -62,8 +59,6 @@ public class TestS3FileSystemFactory {
     public void testCreateFileSystemWithUnknownUser() throws IOException {
         when(mockSession.getUsername()).thenReturn("invalidUsername");
         when(mockProperties.getUsers()).thenReturn(users);
-
-        FileSystem newFileSystem = factory.createFileSystem(mockSession);
 
         verify(mockProvider).newFileSystem(any(URI.class),
                 (Map<String, ?>)argThat(hasEntry(S3FileSystemProviderPlus.PROP_USERNAME, "invalidUsername")));

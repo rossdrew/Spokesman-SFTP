@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 
 /**
  * @Author rossdrew
- * @Created 15/06/16.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class s3S3FileSystemPlusTest {

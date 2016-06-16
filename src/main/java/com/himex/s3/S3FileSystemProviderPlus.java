@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import com.upplication.s3fs.S3FileSystem;
 import com.upplication.s3fs.S3FileSystemProvider;
 import com.upplication.s3fs.S3Path;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.FileChannel;
@@ -26,6 +28,7 @@ import static com.upplication.s3fs.AmazonS3Factory.SECRET_KEY;
  *
  * @Author Ross W. Drew
  */
+@Component
 public class S3FileSystemProviderPlus extends S3FileSystemProvider {
     public static final String PROP_USERNAME = "sftpUsername";
     public static final String PROP_USERHOME = "sftpUserHome";
