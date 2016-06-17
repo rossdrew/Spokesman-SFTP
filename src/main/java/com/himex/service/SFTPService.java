@@ -153,6 +153,6 @@ public class SFTPService implements SpokesmanService {
     @Override
     public String getStatus() {
         boolean isRunning = sshd != null && sshd.isOpen();
-        return "SFTP Server :" + (isRunning ? "" : " Not") + " Running";
+        return "SFTP Server :" + (isRunning ? "" : " Not") + " Running [" + sshd.getActiveSessions() + " active sessions]";
     }
 }
